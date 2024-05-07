@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 #include <fstream>
 
 using namespace std;
@@ -20,6 +22,13 @@ public:
     string getTime() {
         return to_string(year) + "-" + to_string(month) + "-" + to_string(day);
     }
+
+    int getYear() { return year; }
+
+    int getMonth() { return month; }
+
+    int getDay() { return day; }
+
 };
 
 class People {
@@ -46,7 +55,7 @@ class Sender : public People {
 private:
     Time sendTime;  //派送时间
 public:
-    Time getSendTime() { return sendTime; }
+    Time& getSendTime() { return sendTime; }
 
     void setSendTime(Time t) { sendTime = t; }
 };
@@ -55,7 +64,7 @@ class Receiver : public People {
 private:
     Time ReceiveTime;  //收件时间
 public:
-    Time getReceiveTime() { return ReceiveTime; }
+    Time& getReceiveTime() { return ReceiveTime; }
 
     void setReceiveTime(Time t) { ReceiveTime = t; }
 };
@@ -80,11 +89,11 @@ public:
 
     void setWaybillType(int type) { waybillType = type; }
 
-    Sender getSender() { return sender; }
+    Sender& getSender() { return sender; }
 
     void setSender(Sender s) { sender = s; }
 
-    Receiver getReceiver() { return receiver; }
+    Receiver& getReceiver() { return receiver; }
 
     void setReceiver(Receiver r) { receiver = r; }
 
@@ -318,17 +327,32 @@ void ExpressWaybillList::deleteExpressWaybill() {
         if (waybillNumber == "0") {
             break;
         }
+        if (head->next == NULL) {
+            cout << "列表为空，无法删除。" << endl;
+            break;
+        }
         ExpressWaybill *p = head;
+        bool isFound = false;
         while (p->next != NULL) {
             if (p->next->getWaybillNumber() == waybillNumber) {
                 ExpressWaybill *q = p->next;
                 p->next = q->next;
+                if (q == tail) {
+                    tail = p;
+                }
                 delete q;
                 length--;
+                isFound = true;
                 break;
             }
             p = p->next;
         }
+        if (!isFound) {
+            cout << "未找到运单号为 " << waybillNumber << " 的运单。" << endl;
+        } else {
+            cout << "运单号为 " << waybillNumber << " 的运单删除成功" << endl;
+        }
+        cout << "请输入要删除的运单号,输入0结束" << endl;
     }
 }
 
@@ -340,11 +364,20 @@ void ExpressWaybillList::updateExpressWaybill() {
             break;
         }
         ExpressWaybill *p = head->next;
+        bool isFound = false;
         while (p != NULL) {
             if (p->getWaybillNumber() == waybillNumber) {
-                cout << "原快递类型：" << p->getWaybillType() << endl;
+                isFound = true;
+                cout << "原快递类型：";
+                if (p->getWaybillType() == 1) {
+                    cout << "派送单" << endl;
+                } else {
+                    cout << "收件单" << endl;
+                }
                 cout << "你是否要修改快递类型 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                bool change;
+                cin >> change;
+                if (change) {
                     cout << "请输入快递类型 1:派送单 2:收件单" << endl;
                     int waybillType;
                     cin >> waybillType;
@@ -357,7 +390,8 @@ void ExpressWaybillList::updateExpressWaybill() {
                 cout << "电话：" << p->getSender().getPhone() << endl;
                 cout << "备注：" << p->getSender().getRemark() << endl;
                 cout << "你是否要修改寄件人信息 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入地址" << endl;
                     string address;
                     cin >> address;
@@ -380,7 +414,8 @@ void ExpressWaybillList::updateExpressWaybill() {
                 cout << "电话：" << p->getReceiver().getPhone() << endl;
                 cout << "备注：" << p->getReceiver().getRemark() << endl;
                 cout << "你是否要修改收件人信息 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入地址" << endl;
                     string address;
                     cin >> address;
@@ -400,7 +435,8 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原派送时间：" << p->getSender().getSendTime().getTime() << endl;
                 cout << "你是否要修改派送时间 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入派送时间" << endl;
                     Time sendTime;
                     int year, month, day;
@@ -413,7 +449,8 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原收件时间：" << p->getReceiver().getReceiveTime().getTime() << endl;
                 cout << "你是否要修改收件时间 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入收件时间" << endl;
                     Time receiveTime;
                     int year, month, day;
@@ -424,9 +461,15 @@ void ExpressWaybillList::updateExpressWaybill() {
                 } else {
                     p->getReceiver().setReceiveTime(p->getReceiver().getReceiveTime());
                 }
-                cout << "原是否签收：" << p->getIsSign() << endl;
+                cout << "原是否签收：";
+                if (p->getIsSign()) {
+                    cout << "是" << endl;
+                } else {
+                    cout << "否" << endl;
+                }
                 cout << "你是否要修改是否签收 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入是否签收 1:是 0:否" << endl;
                     bool isSign;
                     cin >> isSign;
@@ -435,9 +478,15 @@ void ExpressWaybillList::updateExpressWaybill() {
                     p->setIsSign(p->getIsSign());
                 }
                 if (!p->getIsSign()) {
-                    cout << "原是否为难派件：" << p->getIsDifficult() << endl;
+                    cout << "原是否为难派件：";
+                    if (p->getIsDifficult()) {
+                        cout << "是" << endl;
+                    } else {
+                        cout << "否" << endl;
+                    }
                     cout << "你是否要修改是否为难派件 1:是 0:否" << endl;
-                    if (cin.get() == '1') {
+                    cin >> change;
+                    if (change) {
                         cout << "请输入是否为难派件 1:是 0:否" << endl;
                         bool isDifficult;
                         cin >> isDifficult;
@@ -460,7 +509,8 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原金额：" << p->getAmount() << endl;
                 cout << "你是否要修改金额 1:是 0:否" << endl;
-                if (cin.get() == '1') {
+                cin >> change;
+                if (change) {
                     cout << "请输入金额" << endl;
                     double amount;
                     cin >> amount;
@@ -468,10 +518,15 @@ void ExpressWaybillList::updateExpressWaybill() {
                 } else {
                     p->setAmount(p->getAmount());
                 }
+                cout << "运单号为 " << waybillNumber << " 的运单修改成功" << endl;
                 break;
             }
             p = p->next;
         }
+        if (!isFound) {
+            cout << "未找到运单号为 " << waybillNumber << " 的运单。" << endl;
+        }
+        cout << "请输入要修改的运单号,输入0结束" << endl;
     }
 }
 
@@ -482,8 +537,7 @@ void ExpressWaybillList::saveExpressWaybillToFile() {
         return;
     }
     // 写入 CSV 文件的标题行
-    outputFile
-            << "运单号,快递类型,寄件人地址,寄件人电话,寄件人备注,收件人地址,收件人电话,收件人备注,派送时间,收件时间,是否签收,是否为难派件,难派件原因,金额\n";
+    outputFile<< "运单号,快递类型,寄件人地址,寄件人电话,寄件人备注,收件人地址,收件人电话,收件人备注,派送时间,收件时间,是否签收,是否为难派件,难派件原因,金额\n";
 
     if (!head) {
         cout << "列表为空，无法保存到文件。" << endl;
@@ -534,7 +588,7 @@ void ExpressWaybillList::saveExpressWaybillToFile() {
         p = p->next;
     }
     outputFile.close(); // 关闭文件
-    cout << "运单信息已成功保存到 express_waybills.csv 文件中。" << endl;
+    cout << "运单信息已成功保存到 waybills.csv 文件。" << endl;
 }
 
 void ExpressWaybillList::loadExpressWaybillFromFile() {
@@ -605,7 +659,7 @@ void ExpressWaybillList::loadExpressWaybillFromFile() {
                     isDifficult = token == "是";
                     break;
                 case 12:
-                    difficultReason =token == "地址模糊" ? 1 : token == "用户拒收" ? 2 : token == "电话无效" ? 3 : token == "收件人不在" ? 4 : token == "其他" ? 5 : 0;
+                    difficultReason =token == "地址模糊" ? 1 : token == "用户拒收" ? 2 : token == "电话无效" ? 3 : token =="收件人不在"? 4 : token =="其他"? 5 : 0;
                     break;
                 case 13:
                     amount = stod(token);
@@ -622,10 +676,25 @@ void ExpressWaybillList::loadExpressWaybillFromFile() {
         sender.setRemark(senderRemark);
         Time sendTimeObj;
         pos = 0;
+        int datePart = 0;
         while ((pos = sendTime.find("-")) != string::npos) {
             token = sendTime.substr(0, pos);
-            sendTimeObj.setTime(stoi(token), 0, 0);
+            switch (datePart) {
+                case 0: // Year
+                    sendTimeObj.setTime(stoi(token), 0, 0);
+                    break;
+                case 1: // Month
+                    sendTimeObj.setTime(sendTimeObj.getYear(), stoi(token), 0);
+                    break;
+                case 2: // Day
+                    sendTimeObj.setTime(sendTimeObj.getYear(), sendTimeObj.getMonth(), stoi(token));
+                    break;
+            }
             sendTime.erase(0, pos + 1);
+            datePart++;
+        }
+        if (!sendTime.empty()) {
+            sendTimeObj.setTime(sendTimeObj.getYear(), sendTimeObj.getMonth(), stoi(sendTime));
         }
         sender.setSendTime(sendTimeObj);
         expressWaybill->setSender(sender);
@@ -635,10 +704,26 @@ void ExpressWaybillList::loadExpressWaybillFromFile() {
         receiver.setRemark(receiverRemark);
         Time receiveTimeObj;
         pos = 0;
+        datePart = 0;
         while ((pos = receiveTime.find("-")) != string::npos) {
             token = receiveTime.substr(0, pos);
-            receiveTimeObj.setTime(stoi(token), 0, 0);
+            switch (datePart) {
+                case 0: // Year
+                    receiveTimeObj.setTime(stoi(token), 0, 0);
+                    break;
+                case 1: // Month
+                    receiveTimeObj.setTime(receiveTimeObj.getYear(), stoi(token), 0);
+                    break;
+                case 2: // Day
+                    cout<<stoi(token)<<endl;
+                    receiveTimeObj.setTime(receiveTimeObj.getYear(), receiveTimeObj.getMonth(), stoi(token));
+                    break;
+            }
             receiveTime.erase(0, pos + 1);
+            datePart++;
+        }
+        if (!receiveTime.empty()) {
+            receiveTimeObj.setTime(receiveTimeObj.getYear(), receiveTimeObj.getMonth(), stoi(receiveTime));
         }
         receiver.setReceiveTime(receiveTimeObj);
         expressWaybill->setReceiver(receiver);
@@ -651,7 +736,6 @@ void ExpressWaybillList::loadExpressWaybillFromFile() {
         length++;
     }
     inputFile.close(); // 关闭文件
-    cout << "运单信息已成功从 express_waybills.csv 文件中读取。" << endl;
 }
 
 void ExpressWaybillList::getExpressWaybillByNumber() {
@@ -659,8 +743,10 @@ void ExpressWaybillList::getExpressWaybillByNumber() {
     string waybillNumber;
     cin >> waybillNumber;
     ExpressWaybill *p = head->next;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getWaybillNumber() == waybillNumber) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
             cout << "快递类型：";
             if (p->getWaybillType() == 1) {
@@ -717,6 +803,9 @@ void ExpressWaybillList::getExpressWaybillByNumber() {
         }
         p = p->next;
     }
+    if (!isFound) {
+        cout << "未找到运单号为 " << waybillNumber << " 的运单。" << endl;
+    }
 }
 
 void ExpressWaybillList::getExpressWaybillByTypeAndSenderAndDate() {
@@ -732,9 +821,11 @@ void ExpressWaybillList::getExpressWaybillByTypeAndSenderAndDate() {
     string sendTime;
     sendTime = to_string(year) + "-" + to_string(mouth) + "-" + to_string(day);
     ExpressWaybill *p = head->next;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getWaybillType() == waybillType && p->getSender().getAddress() == senderAddress &&
             p->getSender().getSendTime().getTime() == sendTime) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
             cout << "快递类型：";
             if (p->getWaybillType() == 1) {
@@ -789,6 +880,10 @@ void ExpressWaybillList::getExpressWaybillByTypeAndSenderAndDate() {
             cout << "--------------------------------" << endl;
         }
         p = p->next;
+    }
+    if (!isFound) {
+        cout << "未找到快递类型为 " << waybillType << " 寄件人地址为 " << senderAddress << " 寄件日期为 " << sendTime
+             << " 的运单。" << endl;
     }
 }
 
@@ -803,9 +898,12 @@ void ExpressWaybillList::getExpressWaybillByTypeAndReceiver() {
     string receiverPhone;
     cin >> receiverPhone;
     ExpressWaybill *p = head->next;
+    cout << "查询结果如下：" << endl;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getWaybillType() == waybillType && p->getReceiver().getAddress() == receiverAddress &&
             p->getReceiver().getPhone() == receiverPhone) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
             cout << "快递类型：";
             if (p->getWaybillType() == 1) {
@@ -861,6 +959,10 @@ void ExpressWaybillList::getExpressWaybillByTypeAndReceiver() {
         }
         p = p->next;
     }
+    if (!isFound) {
+        cout << "未找到快递类型为 " << waybillType << " 收件人地址为 " << receiverAddress << " 收件人电话为 "
+             << receiverPhone << " 的运单。" << endl;
+    }
 }
 
 void ExpressWaybillList::getExpressWaybillByType() {
@@ -868,12 +970,17 @@ void ExpressWaybillList::getExpressWaybillByType() {
     int waybillType;
     cin >> waybillType;
     ExpressWaybill *p = head->next;
+    bool isFound = false;
     cout << "查询结果如下：" << endl;
     while (p != NULL) {
         if (p->getWaybillType() == waybillType) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
         }
         p = p->next;
+    }
+    if (!isFound) {
+        cout << "未找到快递类型为 " << waybillType << " 的运单。" << endl;
     }
 }
 
@@ -883,27 +990,37 @@ void ExpressWaybillList::getExpressWaybillByReceiveDate() {
     cin >> year >> month >> day;
     string receiveTime = to_string(year) + "-" + to_string(month) + "-" + to_string(day);
     ExpressWaybill *p = head->next;
+    bool isFound = false;
     cout << "查询结果如下：" << endl;
     while (p != NULL) {
         if (p->getReceiver().getReceiveTime().getTime() == receiveTime) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
         }
         p = p->next;
     }
+    if (!isFound) {
+        cout << "未找到收件日期为 " << receiveTime << " 的运单。" << endl;
+    }
 }
 
 void ExpressWaybillList::getExpressWaybillBySendDate() {
-    cout << "请输入要查询的寄件日期，输入年 月 日" << endl;
+    cout << "请输入要查询的派送日期，输入年 月 日" << endl;
     int year, month, day;
     cin >> year >> month >> day;
     string sendTime = to_string(year) + "-" + to_string(month) + "-" + to_string(day);
     ExpressWaybill *p = head->next;
     cout << "查询结果如下：" << endl;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getSender().getSendTime().getTime() == sendTime) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
         }
         p = p->next;
+    }
+    if (!isFound) {
+        cout << "未找到派送日期为 " << sendTime << " 的运单。" << endl;
     }
 }
 
@@ -915,14 +1032,21 @@ void ExpressWaybillList::getExpressWaybillAndCountByReceiveDate() {
     int count = 0;
     double amount = 0;
     ExpressWaybill *p = head->next;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getReceiver().getReceiveTime().getTime() == receiveTime) {
+            isFound = true;
             count++;
             amount += p->getAmount();
         }
         p = p->next;
     }
-    cout << "收件日期为" << receiveTime << "的快递单数量为" << count << "，总金额为" << amount << "元。" << endl;
+    if (!isFound) {
+        cout << "未找到收件日期为 " << receiveTime << " 的运单。" << endl;
+        return;
+    }else{
+        cout << "收件日期为" << receiveTime << "的快递单数量为" << count << "，总金额为" << amount << "元。" << endl;
+    }
 }
 
 void ExpressWaybillList::getNotReceivedExpressWaybillBySendDate() {
@@ -932,8 +1056,10 @@ void ExpressWaybillList::getNotReceivedExpressWaybillBySendDate() {
     string sendTime = to_string(year) + "-" + to_string(month) + "-" + to_string(day);
     ExpressWaybill *p = head->next;
     cout << "查询结果如下：" << endl;
+    bool isFound = false;
     while (p != NULL) {
         if (p->getSender().getSendTime().getTime() == sendTime && !p->getIsSign()) {
+            isFound = true;
             cout << "运单号：" << p->getWaybillNumber() << endl;
             if (p->getIsDifficult()) {
                 cout << "难派件原因：";
@@ -961,167 +1087,142 @@ void ExpressWaybillList::getNotReceivedExpressWaybillBySendDate() {
         }
         p = p->next;
     }
+    if (!isFound) {
+        cout << "未找到寄件日期为 " << sendTime << " 且未签收的运单。" << endl;
+    }
 }
 
 // 根据派送时间排序
 void ExpressWaybillList::sortExpressWaybillByDate() {
-    // 创建链表的副本
-    ExpressWaybill *copyHead = new ExpressWaybill();
-    ExpressWaybill *copyTail = copyHead;
+    if (head == NULL ) {
+        cout<<"链表为空，无需排序"<<endl;
+        return; // 如果链表为空或只有一个节点，无需排序
+    }else if(head->next == NULL){
+        cout<<"运单号："<<head->getWaybillNumber()<<endl; // 输出头节点的运单号
+        cout<<"派送时间："<<head->getSender().getSendTime().getTime()<<endl; // 输出头节点的派送时间
+        cout<<"收件时间："<<head->getReceiver().getReceiveTime().getTime()<<endl; // 输出头节点的收件时间
+        return;
+    }
+
+    cout<<"想要根据什么时间排序？1.派送时间 2.收件时间"<<endl;
+    int time;
+    cin>>time;
+    cout<<"排序后的结果如下："<<endl;
+    // 创建一个临时数组
+    vector<ExpressWaybill*> tempArray;
     ExpressWaybill *p = head->next;
     while (p != NULL) {
-        ExpressWaybill *copy = new ExpressWaybill();
-        copy->setWaybillNumber(p->getWaybillNumber());
-        copy->setWaybillType(p->getWaybillType());
-        copy->setSender(p->getSender());
-        copy->setReceiver(p->getReceiver());
-        copy->setIsSign(p->getIsSign());
-        copy->setIsDifficult(p->getIsDifficult());
-        copy->setDifficultReason(p->getDifficultReason());
-        copy->setAmount(p->getAmount());
-        copyTail->next = copy;
-        copyTail = copy;
+        tempArray.push_back(p);
         p = p->next;
     }
-    // 对副本进行排序
-    p = copyHead->next;
-    while (p != NULL) {
-        ExpressWaybill *q = p->next;
-        while (q != NULL) {
-            if (p->getSender().getSendTime().getTime() < q->getSender().getSendTime().getTime()) {
-                // 交换 p 和 q
-                ExpressWaybill temp = *p;
-                *p = *q;
-                *q = temp;
-            }
-            q = q->next;
-        }
-        p = p->next;
+
+    // 对临时数组进行排序
+    if(time == 1){
+        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+            return a->getSender().getSendTime().getYear() < b->getSender().getSendTime().getYear() ||
+                   (a->getSender().getSendTime().getYear() == b->getSender().getSendTime().getYear() &&
+                    a->getSender().getSendTime().getMonth() < b->getSender().getSendTime().getMonth()) ||
+                   (a->getSender().getSendTime().getYear() == b->getSender().getSendTime().getYear() &&
+                    a->getSender().getSendTime().getMonth() == b->getSender().getSendTime().getMonth() &&
+                    a->getSender().getSendTime().getDay() < b->getSender().getSendTime().getDay());
+        });
+    }else{
+        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+            return a->getReceiver().getReceiveTime().getYear() < b->getReceiver().getReceiveTime().getYear() ||
+                   (a->getReceiver().getReceiveTime().getYear() == b->getReceiver().getReceiveTime().getYear() &&
+                    a->getReceiver().getReceiveTime().getMonth() < b->getReceiver().getReceiveTime().getMonth()) ||
+                   (a->getReceiver().getReceiveTime().getYear() == b->getReceiver().getReceiveTime().getYear() &&
+                    a->getReceiver().getReceiveTime().getMonth() == b->getReceiver().getReceiveTime().getMonth() &&
+                    a->getReceiver().getReceiveTime().getDay() < b->getReceiver().getReceiveTime().getDay());
+        });
     }
 
     // 输出排序后的结果
-    p = copyHead->next;
-    while (p != NULL) {
-        cout << "运单号：" << p->getWaybillNumber() << endl;
-        cout << "派送时间：" << p->getSender().getSendTime().getTime() << endl;
-        cout << "收件时间：" << p->getReceiver().getReceiveTime().getTime() << endl;
+    for (ExpressWaybill* waybill : tempArray) {
+        cout << "运单号：" << waybill->getWaybillNumber() << endl;
+        cout << "派送时间：" << waybill->getSender().getSendTime().getTime() << endl;
+        cout << "收件时间：" << waybill->getReceiver().getReceiveTime().getTime() << endl;
         cout << "--------------------------------" << endl;
-        p = p->next;
     }
-    // 删除副本
-    p = copyHead;
-    while (p != NULL) {
-        ExpressWaybill *q = p;
-        p = p->next;
-        delete q;
-    }
-
 }
 
 void ExpressWaybillList::sortExpressWaybillByType() {
-    // 创建链表的副本
-    ExpressWaybill *copyHead = new ExpressWaybill();
-    ExpressWaybill *copyTail = copyHead;
-    ExpressWaybill *p = head->next;
-    while (p != NULL) {
-        ExpressWaybill *copy = new ExpressWaybill();
-        copy->setWaybillNumber(p->getWaybillNumber());
-        copy->setWaybillType(p->getWaybillType());
-        copy->setSender(p->getSender());
-        copy->setReceiver(p->getReceiver());
-        copy->setIsSign(p->getIsSign());
-        copy->setIsDifficult(p->getIsDifficult());
-        copy->setDifficultReason(p->getDifficultReason());
-        copy->setAmount(p->getAmount());
-        copyTail->next = copy;
-        copyTail = copy;
-        p = p->next;
-    }
-    // 对副本进行排序
-    p = copyHead->next;
-    while (p != NULL) {
-        ExpressWaybill *q = p->next;
-        while (q != NULL) {
-            if (p->getWaybillType() > q->getWaybillType()) {
-                // 交换 p 和 q
-                ExpressWaybill temp = *p;
-                *p = *q;
-                *q = temp;
-            }
-            q = q->next;
-        }
+    if (head == NULL ) {
+        cout<<"链表为空，无需排序"<<endl;
+        return; // 如果链表为空或只有一个节点，无需排序
+    }else if(head->next == NULL){
+        cout<<"运单号："<<head->getWaybillNumber()<<endl; // 输出头节点的运单号
+        cout<<"快递类型："<<(head->getWaybillType() == 1 ? "派送单" : "收件单")<<endl; // 输出头节点的快递类型
+        return;
     }
 
-    // 输出排序后的结果
-    p = copyHead->next;
+    cout<<"想要将哪种类型的快递单放前面？1.派送单 2.收件单"<<endl;
+    int type;
+    cin>>type;
+    cout<<"排序后的结果如下："<<endl;
+    // 创建一个临时数组
+    vector<ExpressWaybill*> tempArray;
+    ExpressWaybill *p = head->next;
     while (p != NULL) {
-        cout << "运单号：" << p->getWaybillNumber() << endl;
-        cout << "快递类型：";
-        if (p->getWaybillType() == 1) {
-            cout << "派送单" << endl;
-        } else {
-            cout << "收件单" << endl;
-        }
-        cout << "--------------------------------" << endl;
+        tempArray.push_back(p);
         p = p->next;
     }
-    // 删除副本
-    p = copyHead;
-    while (p != NULL) {
-        ExpressWaybill *q = p;
-        p = p->next;
-        delete q;
+
+    // 对临时数组进行排序
+    sort(tempArray.begin(), tempArray.end(), [type](ExpressWaybill* a, ExpressWaybill* b) {
+        if(type == 1){
+            return a->getWaybillType() < b->getWaybillType();
+        }else{
+            return a->getWaybillType() > b->getWaybillType();
+        }
+    });
+
+    // 输出排序后的结果
+    for (ExpressWaybill* waybill : tempArray) {
+        cout << "运单号：" << waybill->getWaybillNumber() << endl;
+        cout << "快递类型：" << (waybill->getWaybillType() == 1 ? "派送单" : "收件单") << endl;
+        cout << "--------------------------------" << endl;
     }
 }
 
 void ExpressWaybillList::sortExpressWaybillByAmount() {
-    // 创建链表的副本
-    ExpressWaybill *copyHead = new ExpressWaybill();
-    ExpressWaybill *copyTail = copyHead;
+    if (head == NULL ) {
+        cout<<"链表为空，无需排序"<<endl;
+        return; // 如果链表为空或只有一个节点，无需排序
+    }else if(head->next == NULL){
+        cout<<"运单号："<<head->getWaybillNumber()<<endl; // 输出头节点的运单号
+        cout<<"金额："<<head->getAmount()<<endl; // 输出头节点的金额
+        return;
+    }
+
+    int sort_type;
+    cout<<"想要按什么顺序排序？1.升序 2.降序"<<endl;
+    cin>>sort_type;
+    cout<<"排序后的结果如下："<<endl;
+    // 创建一个临时数组
+    vector<ExpressWaybill*> tempArray;
     ExpressWaybill *p = head->next;
     while (p != NULL) {
-        ExpressWaybill *copy = new ExpressWaybill();
-        copy->setWaybillNumber(p->getWaybillNumber());
-        copy->setWaybillType(p->getWaybillType());
-        copy->setSender(p->getSender());
-        copy->setReceiver(p->getReceiver());
-        copy->setIsSign(p->getIsSign());
-        copy->setIsDifficult(p->getIsDifficult());
-        copy->setDifficultReason(p->getDifficultReason());
-        copy->setAmount(p->getAmount());
-        copyTail->next = copy;
-        copyTail = copy;
+        tempArray.push_back(p);
         p = p->next;
     }
-    // 对副本进行排序
-    p = copyHead->next;
-    while (p != NULL) {
-        ExpressWaybill *q = p->next;
-        while (q != NULL) {
-            if (p->getAmount() < q->getAmount()) {
-                // 交换 p 和 q
-                ExpressWaybill temp = *p;
-                *p = *q;
-                *q = temp;
-            }
-            q = q->next;
-        }
+
+    // 对临时数组进行排序
+    if(sort_type == 1){
+        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+            return a->getAmount() < b->getAmount();
+        });
+    }else{
+        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+            return a->getAmount() > b->getAmount();
+        });
     }
 
     // 输出排序后的结果
-    p = copyHead->next;
-    while (p != NULL) {
-        cout << "运单号：" << p->getWaybillNumber() << endl;
-        cout << "金额：" << p->getAmount() << endl;
+    for (ExpressWaybill* waybill : tempArray) {
+        cout << "运单号：" << waybill->getWaybillNumber() << endl;
+        cout << "金额：" << waybill->getAmount() << endl;
         cout << "--------------------------------" << endl;
-        p = p->next;
-    }
-    // 删除副本
-    p = copyHead;
-    while (p != NULL) {
-        ExpressWaybill *q = p;
-        p = p->next;
-        delete q;
     }
 }
 
@@ -1142,7 +1243,7 @@ int main() {
     ExpressWaybillList expressWaybillList;
     // 读取文件中的运单信息
     expressWaybillList.loadExpressWaybillFromFile();
-    cout<<"快递运单管理系统初始化完成"<<endl;
+    cout << "快递运单管理系统初始化完成" << endl;
     int user_type; //1:普通用户 2:管理员
     string key = getKeyFromFile();
     string password;
@@ -1155,13 +1256,13 @@ int main() {
     }
     int choice;
     if (user_type == 1) {
-        cout << "欢迎用户登录快递运单管理系统" << endl;
         cout << "请选择操作，输入0再看一遍操作选择" << endl;
         cout << "1.根据单号查询运单" << endl;
         cout << "2.根据快递类别、寄件人信息和寄件日期查询运单" << endl;
         cout << "3.根据快递类别和收件人信息查询运单" << endl;
+        cout << "4.退出当前用户，重新登录" << endl;
+        cout << "5.退出" << endl;
     } else {
-        cout << "欢迎管理员登录快递运单管理系统" << endl;
         cout << "请选择操作，输入0再看一遍操作选择" << endl;
         cout << "1.添加运单" << endl;
         cout << "2.删除运单" << endl;
@@ -1178,10 +1279,11 @@ int main() {
         cout << "13.将快递信息按金额排序" << endl;
         cout << "14.保存运单信息到文件" << endl;
         cout << "15.从文件中读取运单信息" << endl;
-        cout << "16.退出" << endl;
+        cout << "16.退出管理员账号，进入用户模式" << endl;
+        cout << "17.退出" << endl;
     }
     cin >> choice;
-    while (choice != 16) {
+    while (true) {
         switch (choice) {
             case 0:
                 if (user_type == 1) {
@@ -1189,6 +1291,8 @@ int main() {
                     cout << "1.根据单号查询运单" << endl;
                     cout << "2.根据快递类别、寄件人信息和寄件日期查询运单" << endl;
                     cout << "3.根据快递类别和收件人信息查询运单" << endl;
+                    cout << "4.退出当前用户" << endl;
+                    cout << "5.退出" << endl;
                 } else {
                     cout << "请选择操作，输入0再看一遍操作选择" << endl;
                     cout << "1.添加运单" << endl;
@@ -1206,7 +1310,8 @@ int main() {
                     cout << "13.将快递信息按金额排序" << endl;
                     cout << "14.保存运单信息到文件" << endl;
                     cout << "15.从文件中读取运单信息" << endl;
-                    cout << "16.退出" << endl;
+                    cout << "16.退出管理员账号，进入用户模式" << endl;
+                    cout << "17.退出" << endl;
                 }
                 break;
             case 1:
@@ -1232,97 +1337,151 @@ int main() {
                 break;
             case 4:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "请输入管理员密码，输入正确密码进入管理员模式，输入其他则进入用户模式" << endl;
+                    cin >> password;
+                    if (password != key) {
+                        user_type = 1;
+                    } else {
+                        user_type = 2;
+                    }
+                    if (user_type == 1) {
+                        cout << "请选择操作，输入0再看一遍操作选择" << endl;
+                        cout << "1.根据单号查询运单" << endl;
+                        cout << "2.根据快递类别、寄件人信息和寄件日期查询运单" << endl;
+                        cout << "3.根据快递类别和收件人信息查询运单" << endl;
+                        cout << "4.退出当前用户，重新登录" << endl;
+                        cout << "5.退出" << endl;
+                    } else {
+                        cout << "请选择操作，输入0再看一遍操作选择" << endl;
+                        cout << "1.添加运单" << endl;
+                        cout << "2.删除运单" << endl;
+                        cout << "3.修改运单" << endl;
+                        cout << "4.显示所有运单" << endl;
+                        cout << "5.根据单号查询运单" << endl;
+                        cout << "6.根据快递类别查询所有运单" << endl;
+                        cout << "7.根据收件日期查询所有运单" << endl;
+                        cout << "8.根据寄件日期查询所有运单" << endl;
+                        cout << "9.根据收件日期统计快递单数量和金额" << endl;
+                        cout << "10.根据寄件日期显示未签收的快递单，并显示所有疑难件" << endl;
+                        cout << "11.将快递信息按日期排序" << endl;
+                        cout << "12.将快递信息按类别排序" << endl;
+                        cout << "13.将快递信息按金额排序" << endl;
+                        cout << "14.保存运单信息到文件" << endl;
+                        cout << "15.从文件中读取运单信息" << endl;
+                        cout << "16.退出管理员账号，进入用户模式" << endl;
+                        cout << "17.退出" << endl;
+                    }
                 } else {
                     expressWaybillList.displayExpressWaybill();
                 }
                 break;
             case 5:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    return 0;
                 } else {
                     expressWaybillList.getExpressWaybillByNumber();
                 }
                 break;
             case 6:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.getExpressWaybillByType();
                 }
                 break;
             case 7:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.getExpressWaybillByReceiveDate();
                 }
                 break;
             case 8:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.getExpressWaybillBySendDate();
                 }
                 break;
             case 9:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.getExpressWaybillAndCountByReceiveDate();
                 }
                 break;
             case 10:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.getNotReceivedExpressWaybillBySendDate();
                 }
                 break;
             case 11:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.sortExpressWaybillByDate();
                 }
                 break;
             case 12:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.sortExpressWaybillByType();
                 }
                 break;
             case 13:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.sortExpressWaybillByAmount();
                 }
                 break;
             case 14:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.saveExpressWaybillToFile();
                 }
                 break;
             case 15:
                 if (user_type == 1) {
-                    cout<<"无效的选项"<<endl;
+                    cout << "无效的选项" << endl;
                 } else {
                     expressWaybillList.loadExpressWaybillFromFile();
+                    cout<<"从文件中读取运单信息成功"<<endl;
                 }
                 break;
             case 16:
-                cout << "退出" << endl;
-                return 0;
+                if (user_type == 1) {
+                    cout << "无效的选项" << endl;
+                } else {
+                    cout << "退出当前管理员" << endl;
+                    user_type = 1;
+                    cout << "请选择操作，输入0再看一遍操作选择" << endl;
+                    cout << "1.根据单号查询运单" << endl;
+                    cout << "2.根据快递类别、寄件人信息和寄件日期查询运单" << endl;
+                    cout << "3.根据快递类别和收件人信息查询运单" << endl;
+                    cout << "4.退出当前用户" << endl;
+                    cout << "5.退出" << endl;
+                }
+                break;
+            case 17:
+                if (user_type == 1) {
+                    cout << "无效的选项" << endl;
+                } else {
+                    cout << "退出" << endl;
+                    return 0;
+                }
+                break;
             default:
                 cout << "无效的选项" << endl;
                 break;
 
         }
-        cout << "请选择操作，输入0再看一遍操作选择" << endl;
+        cout<<"================================"<<endl;
+        cout << "请选择操作，输入0重新查看操作选择" << endl;
         cin >> choice;
     }
     return 0;
