@@ -1,4 +1,5 @@
 #include "../include/list.h"
+#include "mid.cpp"
 #include <fstream>
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@ void ExpressWaybillList::addExpressWaybill() {
         expressWaybill->setWaybillNumber(waybillNumber);
         cout << "请输入快递类型 1:派送单 2:收件单" << endl;
         int waybillType;
-        cin >> waybillType;
+        waybillType=getInput(a,2);
         expressWaybill->setWaybillType(waybillType);
         cout << "请输入寄件人信息" << endl;
         Sender sender;
@@ -76,17 +77,17 @@ void ExpressWaybillList::addExpressWaybill() {
         expressWaybill->setReceiver(receiver);
         cout << "请输入是否签收 1:是 0:否" << endl;
         bool isSign;
-        cin >> isSign;
+        isSign=getInput(b,2);
         expressWaybill->setIsSign(isSign);
         if (!isSign) {
             cout << "请输入是否为难派件 1:是 0:否" << endl;
             bool isDifficult;
-            cin >> isDifficult;
+            isDifficult=getInput(b,2);
             expressWaybill->setIsDifficult(isDifficult);
             if (isDifficult) {
                 cout << "请输入难派件原因 1：地址模糊 2：用户拒收 3：电话无效 4：收件人不在 5：其他" << endl;
                 int difficultReason;
-                cin >> difficultReason;
+                difficultReason=getInput(c,5);
                 expressWaybill->setDifficultReason(difficultReason);
             } else {
                 expressWaybill->setDifficultReason(0);
@@ -188,14 +189,13 @@ void ExpressWaybillList::deleteExpressWaybill() {
                 delete q;
                 length--;
                 isFound = true;
+                cout << "运单号为 " << waybillNumber << " 的运单已删除" << endl;
                 break;
             }
             p = p->next;
         }
         if (!isFound) {
             cout << "未找到运单号为 " << waybillNumber << " 的运单。" << endl;
-        } else {
-            cout << "运单号为 " << waybillNumber << " 的运单删除成功" << endl;
         }
         cout << "请输入要删除的运单号,输入0结束" << endl;
     }
@@ -221,11 +221,11 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "你是否要修改快递类型 1:是 0:否" << endl;
                 bool change;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入快递类型 1:派送单 2:收件单" << endl;
                     int waybillType;
-                    cin >> waybillType;
+                    waybillType=getInput(a,2);
                     p->setWaybillType(waybillType);
                 } else {
                     p->setWaybillType(p->getWaybillType());
@@ -235,7 +235,7 @@ void ExpressWaybillList::updateExpressWaybill() {
                 cout << "电话：" << p->getSender().getPhone() << endl;
                 cout << "备注：" << p->getSender().getRemark() << endl;
                 cout << "你是否要修改寄件人信息 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入地址" << endl;
                     string address;
@@ -259,7 +259,7 @@ void ExpressWaybillList::updateExpressWaybill() {
                 cout << "电话：" << p->getReceiver().getPhone() << endl;
                 cout << "备注：" << p->getReceiver().getRemark() << endl;
                 cout << "你是否要修改收件人信息 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入地址" << endl;
                     string address;
@@ -280,7 +280,7 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原派送时间：" << p->getSender().getSendTime().getTime() << endl;
                 cout << "你是否要修改派送时间 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入派送时间" << endl;
                     Time sendTime;
@@ -294,7 +294,7 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原收件时间：" << p->getReceiver().getReceiveTime().getTime() << endl;
                 cout << "你是否要修改收件时间 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入收件时间" << endl;
                     Time receiveTime;
@@ -313,11 +313,11 @@ void ExpressWaybillList::updateExpressWaybill() {
                     cout << "否" << endl;
                 }
                 cout << "你是否要修改是否签收 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入是否签收 1:是 0:否" << endl;
                     bool isSign;
-                    cin >> isSign;
+                    isSign=getInput(b,2);
                     p->setIsSign(isSign);
                 } else {
                     p->setIsSign(p->getIsSign());
@@ -330,16 +330,16 @@ void ExpressWaybillList::updateExpressWaybill() {
                         cout << "否" << endl;
                     }
                     cout << "你是否要修改是否为难派件 1:是 0:否" << endl;
-                    cin >> change;
+                    change = getInput(b,2);
                     if (change) {
                         cout << "请输入是否为难派件 1:是 0:否" << endl;
                         bool isDifficult;
-                        cin >> isDifficult;
+                        isDifficult=getInput(b,2);
                         p->setIsDifficult(isDifficult);
                         if (isDifficult) {
                             cout << "请输入难派件原因 1：地址模糊 2：用户拒收 3：电话无效 4：收件人不在 5：其他" << endl;
                             int difficultReason;
-                            cin >> difficultReason;
+                            difficultReason=getInput(c,5);
                             p->setDifficultReason(difficultReason);
                         } else {
                             p->setDifficultReason(0);
@@ -354,7 +354,7 @@ void ExpressWaybillList::updateExpressWaybill() {
                 }
                 cout << "原金额：" << p->getAmount() << endl;
                 cout << "你是否要修改金额 1:是 0:否" << endl;
-                cin >> change;
+                change = getInput(b,2);
                 if (change) {
                     cout << "请输入金额" << endl;
                     double amount;
@@ -656,7 +656,7 @@ void ExpressWaybillList::getExpressWaybillByNumber() {
 void ExpressWaybillList::getExpressWaybillByTypeAndSenderAndDate() {
     cout << "请输入要查询的快递类型 1:派送单 2:收件单" << endl;
     int waybillType;
-    cin >> waybillType;
+    waybillType=getInput(a,2);
     cout << "请输入寄件人地址" << endl;
     string senderAddress;
     cin >> senderAddress;
@@ -951,7 +951,7 @@ void ExpressWaybillList::sortExpressWaybillByDate() {
 
     cout<<"想要根据什么时间排序？1.派送时间 2.收件时间"<<endl;
     int time;
-    cin>>time;
+    time = getInput(b,2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
@@ -1003,7 +1003,7 @@ void ExpressWaybillList::sortExpressWaybillByType() {
 
     cout<<"想要将哪种类型的快递单放前面？1.派送单 2.收件单"<<endl;
     int type;
-    cin>>type;
+    type = getInput(b,2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
@@ -1042,7 +1042,7 @@ void ExpressWaybillList::sortExpressWaybillByAmount() {
 
     int sort_type;
     cout<<"想要按什么顺序排序？1.升序 2.降序"<<endl;
-    cin>>sort_type;
+    sort_type = getInput(b,2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
