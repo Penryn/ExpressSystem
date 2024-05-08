@@ -28,7 +28,7 @@ int main() {
     } else {
         getAdminMenu();
     }
-    cin >> choice;
+    choice = getInput<int>();
     while (true) {
         switch (choice) {
             case 0:
@@ -179,6 +179,6 @@ int main() {
         }
         cout<<"================================"<<endl;
         cout << "请选择操作，输入0重新查看操作选择" << endl;
-        cin >> choice;
+        choice =getInput<int>();
     }
 }

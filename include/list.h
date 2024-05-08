@@ -43,5 +43,7 @@ public:
 
     void sortExpressWaybillByAmount();
 
+    bool searchExpressWaybillByNumber(string number);
+
 
 };

@@ -14,6 +14,9 @@ private:
     double amount;         //金额
 public:
     ExpressWaybill *next;  //下一个运单
+
+
+
     string getWaybillNumber();
 
     void setWaybillNumber(string number);
