@@ -6,7 +6,6 @@
 #include "file.cpp"
 using namespace std;
 
-
 int main() {
     ExpressWaybillList expressWaybillList;
     // 读取文件中的运单信息
@@ -18,8 +17,10 @@ int main() {
     cout << "请输入管理员密码，输入正确密码进入管理员模式，输入其他则进入用户模式" << endl;
     cin >> password;
     if (password != key) {
+        cout<<"密码错误，进入用户模式"<<endl;
         user_type = 1;
     } else {
+        cout<<"密码正确，进入管理员模式"<<endl;
         user_type = 2;
     }
     int choice;
@@ -81,7 +82,14 @@ int main() {
                 if (user_type == 1) {
                     return 0;
                 } else {
-                    expressWaybillList.getExpressWaybillByNumber();
+                    int n;
+                    cout<<"请选择查询方式：1.模糊查询 2.精确查询"<<endl;
+                    n= getRightInput(b,2);
+                    if(n==1){
+                        expressWaybillList.getBlurExpressWaybillByNumber();
+                    }else{
+                        expressWaybillList.getExpressWaybillByNumber();
+                    }
                 }
                 break;
             case 6:
@@ -168,6 +176,13 @@ int main() {
                 if (user_type == 1) {
                     cout << "无效的选项" << endl;
                 } else {
+                    expressWaybillList.getExpressWaybillByLastInput();
+                }
+                break;
+            case 18:
+                if (user_type == 1) {
+                    cout << "无效的选项" << endl;
+                } else {
                     cout << "退出" << endl;
                     return 0;
                 }
@@ -178,7 +193,7 @@ int main() {
 
         }
         cout<<"================================"<<endl;
-        cout << "请选择操作，输入0重新查看操作选择" << endl;
+        cout << "操作已完成，请重新选择操作，输入0可以重新查看操作选项" << endl;
         choice =getInput<int>();
     }
 }

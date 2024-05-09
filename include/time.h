@@ -11,11 +11,11 @@ private:
 public:
     void setTime(int y, int m, int d) ;
 
-    string getTime() ;
+    string getTime() const ;
 
-    int getYear() ;
+    int getYear() const ;
 
-    int getMonth();
+    int getMonth() const;
 
-    int getDay();
+    int getDay() const;
 };

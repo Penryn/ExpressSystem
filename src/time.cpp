@@ -7,19 +7,19 @@ void Time::setTime(int y, int m, int d) {
     day = d;
 }
 
-string Time::getTime() {
-    return to_string(year) + "." + to_string(month) + "." + to_string(day);
+string Time::getTime() const {
+    return to_string(year) + "-" + to_string(month) + "-" + to_string(day);
 }
 
-int Time::getYear() {
+int Time::getYear() const {
     return year;
 }
 
-int Time::getMonth() {
+int Time::getMonth() const {
     return month;
 }
 
-int Time::getDay() {
+int Time::getDay() const {
     return day;
 }
 

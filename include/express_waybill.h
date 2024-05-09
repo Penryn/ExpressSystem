@@ -13,6 +13,7 @@ private:
     int difficultReason;   //难派件原因  1：地址模糊 2：用户拒收 3：电话无效 4：收件人不在 5：其他
     double amount;         //金额
 public:
+    ExpressWaybill *prev;  //上一个运单
     ExpressWaybill *next;  //下一个运单
 
 
@@ -21,7 +22,7 @@ public:
 
     void setWaybillNumber(string number);
 
-    int getWaybillType();
+    int getWaybillType() const;
 
     void setWaybillType(int type);
 
@@ -33,19 +34,19 @@ public:
 
     void setReceiver(Receiver r);
 
-    bool getIsSign() ;
+    bool getIsSign() const ;
 
     void setIsSign(bool sign);
 
-    bool getIsDifficult() ;
+    bool getIsDifficult() const ;
 
     void setIsDifficult(bool difficult);
 
-    int getDifficultReason();
+    int getDifficultReason() const;
 
     void setDifficultReason(int reason);
 
-    double getAmount() ;
+    double getAmount() const ;
 
     void setAmount(double amt);
 };

@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "../include/people.h"
 
 string People::getAddress() {
@@ -5,7 +7,7 @@ string People::getAddress() {
 }
 
 void People::setAddress(string a) {
-    address = a;
+    address = std::move(a);
 }
 
 string People::getPhone() {
@@ -13,7 +15,7 @@ string People::getPhone() {
 }
 
 void People::setPhone(string p) {
-    phone = p;
+    phone = std::move(p);
 }
 
 string People::getRemark() {
@@ -21,7 +23,7 @@ string People::getRemark() {
 }
 
 void People::setRemark(string r) {
-    remark = r;
+    remark = std::move(r);
 }
 
 Time &Sender::getSendTime() {

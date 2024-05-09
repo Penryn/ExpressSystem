@@ -23,6 +23,8 @@ public:
 
     void getExpressWaybillByNumber();
 
+    void getBlurExpressWaybillByNumber();
+
     void getExpressWaybillByTypeAndSenderAndDate();
 
     void getExpressWaybillByTypeAndReceiver();
@@ -43,7 +45,8 @@ public:
 
     void sortExpressWaybillByAmount();
 
-    bool searchExpressWaybillByNumber(string number);
+    bool searchExpressWaybillByNumber(const string& number);
 
+    void getExpressWaybillByLastInput();
 
 };

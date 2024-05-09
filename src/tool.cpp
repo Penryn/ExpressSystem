@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include "time.h"
 using namespace std;
 
 int a[2]={1,2};
@@ -72,7 +71,7 @@ Time getTimeInput() {
     while(true) {
         cin >> year >> month >> day;
         if(isValidDate(year, month, day)) {
-            Time time;
+            Time time{};
             time.setTime(year, month, day);
             return time;
         } else {

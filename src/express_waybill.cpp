@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "../include/express_waybill.h"
 
 
@@ -6,10 +8,10 @@ string ExpressWaybill::getWaybillNumber() {
 }
 
 void ExpressWaybill::setWaybillNumber(string number) {
-    waybillNumber = number;
+    waybillNumber = std::move(number);
 }
 
-int ExpressWaybill::getWaybillType() {
+int ExpressWaybill::getWaybillType() const {
     return waybillType;
 }
 
@@ -22,7 +24,7 @@ Sender &ExpressWaybill::getSender() {
 }
 
 void ExpressWaybill::setSender(Sender s) {
-    sender = s;
+    sender = std::move(s);
 }
 
 Receiver &ExpressWaybill::getReceiver() {
@@ -30,10 +32,10 @@ Receiver &ExpressWaybill::getReceiver() {
 }
 
 void ExpressWaybill::setReceiver(Receiver r) {
-    receiver = r;
+    receiver = std::move(r);
 }
 
-bool ExpressWaybill::getIsSign() {
+bool ExpressWaybill::getIsSign() const {
     return isSign;
 }
 
@@ -41,7 +43,7 @@ void ExpressWaybill::setIsSign(bool sign) {
     isSign = sign;
 }
 
-bool ExpressWaybill::getIsDifficult() {
+bool ExpressWaybill::getIsDifficult() const {
     return isDifficult;
 }
 
@@ -49,7 +51,7 @@ void ExpressWaybill::setIsDifficult(bool difficult) {
     isDifficult = difficult;
 }
 
-int ExpressWaybill::getDifficultReason() {
+int ExpressWaybill::getDifficultReason() const {
     return difficultReason;
 }
 
@@ -57,7 +59,7 @@ void ExpressWaybill::setDifficultReason(int reason) {
     difficultReason = reason;
 }
 
-double ExpressWaybill::getAmount() {
+double ExpressWaybill::getAmount() const {
     return amount;
 }
 
