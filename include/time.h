@@ -18,4 +18,6 @@ public:
     int getMonth() const;
 
     int getDay() const;
+
+    bool  operator < (const Time &t) const;
 };

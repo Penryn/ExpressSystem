@@ -71,7 +71,14 @@ void ExpressWaybillList::addExpressWaybill() {
         receiver.setRemark(remark);
         Time receiveTime{};
         cout << "请输入收件时间，输入年 月 日，用空格分隔" << endl;
-        receiveTime= getTimeInput();
+        while (true) {
+            receiveTime= getTimeInput();
+            if (receiveTime.getTime() < sendTime.getTime()) {
+                cout << "收件时间不能早于派送时间，请重新输入" << endl;
+            } else {
+                break;
+            }
+        }
         receiver.setReceiveTime(receiveTime);
         expressWaybill->setReceiver(receiver);
         cout << "请输入是否签收 1:是 0:否" << endl;
@@ -103,6 +110,7 @@ void ExpressWaybillList::addExpressWaybill() {
         tail->next->prev = tail;
         tail = expressWaybill;
         length++;
+        cout<< "运单号为 " << waybillNumber << " 的运单已添加" << endl;
         cout << "请输入运单号,输入0结束" << endl;
     }
 }
@@ -183,6 +191,9 @@ void ExpressWaybillList::deleteExpressWaybill() {
             if (p->next->getWaybillNumber() == waybillNumber) {
                 ExpressWaybill *q = p->next;
                 p->next = q->next;
+                if (q->next != nullptr) {
+                    q->next->prev = p;
+                }
                 if (q == tail) {
                     tail = p;
                 }
@@ -417,9 +428,6 @@ void ExpressWaybillList::saveExpressWaybillToFile() {
             case 5:
                 outputFile << "其他";
                 break;
-            default:
-                outputFile << "未知原因";
-                break;
         }
         outputFile << ",";
         outputFile << p->getAmount() << ",\n";
@@ -431,6 +439,7 @@ void ExpressWaybillList::saveExpressWaybillToFile() {
 }
 
 void ExpressWaybillList::loadExpressWaybillFromFile() {
+    clear();
     ifstream inputFile("./data/waybills.csv"); // 打开 CSV 文件
     if (!inputFile.is_open()) {
         cout << "无法打开文件！" << endl;
@@ -632,9 +641,6 @@ void ExpressWaybillList::getExpressWaybillByNumber() {
                     break;
                 case 5:
                     cout << "其他" << endl;
-                    break;
-                default:
-                    cout << "未知原因" << endl;
                     break;
             }
             cout << "金额：" << p->getAmount() << endl;
@@ -956,7 +962,7 @@ void ExpressWaybillList::getExpressWaybillAndCountByReceiveDate() {
 }
 
 void ExpressWaybillList::getNotReceivedExpressWaybillBySendDate() {
-    cout << "请输入要查询的寄件日期，输入年 月 日,用空格分隔" << endl;
+    cout << "请输入要查询的派送日期，输入年 月 日,用空格分隔" << endl;
     Time sendTime = getTimeInput();
     ExpressWaybill *p = head->next;
     cout << "查询结果如下：" << endl;
@@ -983,11 +989,11 @@ void ExpressWaybillList::getNotReceivedExpressWaybillBySendDate() {
                     case 5:
                         cout << "其他" << endl;
                         break;
-                    default:
-                        cout << "未知原因" << endl;
-                        break;
                 }
+
             }
+            cout << "--------------------------------" << endl;
+
         }
         p = p->next;
     }
@@ -1009,10 +1015,12 @@ void ExpressWaybillList::sortExpressWaybillByDate() {
         cout<<"收件时间："<<head->getReceiver().getReceiveTime().getTime()<<endl; // 输出头节点的收件时间
         return;
     }
-
     cout<<"想要根据什么时间排序？1.派送时间 2.收件时间"<<endl;
     int time;
-    time = getRightInput(b, 2);
+    time = getRightInput(a, 2);
+    int sort_type;
+    cout<<"想要按什么顺序排序？1.升序 2.降序"<<endl;
+    sort_type = getRightInput(a, 2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
@@ -1024,23 +1032,25 @@ void ExpressWaybillList::sortExpressWaybillByDate() {
 
     // 对临时数组进行排序
     if(time == 1){
-        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
-            return a->getSender().getSendTime().getYear() < b->getSender().getSendTime().getYear() ||
-                   (a->getSender().getSendTime().getYear() == b->getSender().getSendTime().getYear() &&
-                    a->getSender().getSendTime().getMonth() < b->getSender().getSendTime().getMonth()) ||
-                   (a->getSender().getSendTime().getYear() == b->getSender().getSendTime().getYear() &&
-                    a->getSender().getSendTime().getMonth() == b->getSender().getSendTime().getMonth() &&
-                    a->getSender().getSendTime().getDay() < b->getSender().getSendTime().getDay());
-        });
+        if(sort_type == 1){
+            sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+                return a->getSender().getSendTime() < b->getSender().getSendTime();
+            });
+        }else{
+            sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+                return ! (a->getSender().getSendTime() < b->getSender().getSendTime());
+            });
+        }
     }else{
-        sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
-            return a->getReceiver().getReceiveTime().getYear() < b->getReceiver().getReceiveTime().getYear() ||
-                   (a->getReceiver().getReceiveTime().getYear() == b->getReceiver().getReceiveTime().getYear() &&
-                    a->getReceiver().getReceiveTime().getMonth() < b->getReceiver().getReceiveTime().getMonth()) ||
-                   (a->getReceiver().getReceiveTime().getYear() == b->getReceiver().getReceiveTime().getYear() &&
-                    a->getReceiver().getReceiveTime().getMonth() == b->getReceiver().getReceiveTime().getMonth() &&
-                    a->getReceiver().getReceiveTime().getDay() < b->getReceiver().getReceiveTime().getDay());
-        });
+        if(sort_type == 1){
+            sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+                return a->getReceiver().getReceiveTime() < b->getReceiver().getReceiveTime();
+            });
+        }else{
+            sort(tempArray.begin(), tempArray.end(), [](ExpressWaybill* a, ExpressWaybill* b) {
+                return ! (a->getReceiver().getReceiveTime() < b->getReceiver().getReceiveTime());
+            });
+        }
     }
 
     // 输出排序后的结果
@@ -1065,7 +1075,7 @@ void ExpressWaybillList::sortExpressWaybillByType() {
 
     cout<<"想要将哪种类型的快递单放前面？1.派送单 2.收件单"<<endl;
     int type;
-    type = getRightInput(b, 2);
+    type = getRightInput(a, 2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
@@ -1105,7 +1115,7 @@ void ExpressWaybillList::sortExpressWaybillByAmount() {
 
     int sort_type;
     cout<<"想要按什么顺序排序？1.升序 2.降序"<<endl;
-    sort_type = getRightInput(b, 2);
+    sort_type = getRightInput(a, 2);
     cout<<"排序后的结果如下："<<endl;
     // 创建一个临时数组
     vector<ExpressWaybill*> tempArray;
@@ -1184,4 +1194,16 @@ void ExpressWaybillList::getExpressWaybillByLastInput(){
         count++;
     }
     cout<<"可以再输入5，进一步通过运单号具体查询运单的具体信息"<<endl;
+}
+
+void ExpressWaybillList::clear() {
+    ExpressWaybill *p = head;
+    while (p != nullptr) {
+        ExpressWaybill *q = p;
+        p = p->next;
+        delete q;
+    }
+    head = new ExpressWaybill();
+    tail = head;
+    length = 0;
 }

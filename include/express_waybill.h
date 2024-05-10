@@ -16,8 +16,6 @@ public:
     ExpressWaybill *prev;  //上一个运单
     ExpressWaybill *next;  //下一个运单
 
-
-
     string getWaybillNumber();
 
     void setWaybillNumber(string number);

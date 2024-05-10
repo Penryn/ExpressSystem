@@ -23,3 +23,15 @@ int Time::getDay() const {
     return day;
 }
 
+bool Time::operator<(const Time &t) const {
+    if (year < t.year) {
+        return true;
+    } else if (year == t.year) {
+        if (month < t.month) {
+            return true;
+        } else if (month == t.month) {
+            return day < t.day;
+        }
+    }
+    return false;
+}

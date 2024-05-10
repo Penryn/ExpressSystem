@@ -49,4 +49,6 @@ public:
 
     void getExpressWaybillByLastInput();
 
+    void clear();
+
 };
