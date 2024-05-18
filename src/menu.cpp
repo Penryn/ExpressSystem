@@ -1,6 +1,4 @@
 #include <iostream>
-
-
 void getUserMenu() {
     cout << "请选择操作，输入0再看一遍操作选择" << endl;
     cout << "1.根据单号具体查询运单" << endl;
@@ -9,7 +7,6 @@ void getUserMenu() {
     cout << "4.退出当前用户，重新进入登录状态" << endl;
     cout << "5.退出" << endl;
 }
-
 void getAdminMenu(){
     cout << "请选择操作，输入0再看一遍操作选择" << endl;
     cout << "1.添加运单" << endl;

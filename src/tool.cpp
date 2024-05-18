@@ -64,8 +64,6 @@ T getInput() {
     return input;
 }
 
-
-
 Time getTimeInput() {
     int year, month, day;
     while(true) {
